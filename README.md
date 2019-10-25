@@ -1,10 +1,16 @@
 # Carsync Classic client library
-This project is a java library to access and use the classical (https://portal.carsync-log.de) REST API. It provides implementations of some endpoints entities, but can be easily extended.
+This project is a java library to access and use the classical (https://portal.carsync-log.de) REST API. It provides implementations for following Endpoints:
+* user
+* vehicle
+* division
+* company
+
+but can be easily extended with other.
 
 ## How to use
-Import it in your project.
+### Basic
+Provide credentials
 ```
-// Provide credentials
 CarsyncSession carsyncSession = new CarsyncSession("test@test.com", "password");
 ```
 To access the vehicle API
@@ -43,4 +49,21 @@ vehicleService.delete(vehicle);
 or just by id
 ```
 vehicleService.update(1234);
+```
+
+
+### More features
+Query parameters. Usually "getField" to extend the data to fetch and "field" to filter
+```
+Map<String, Serializable> params = new HashMap<>();
+params.put("getDivision", 1); // get division sub object in result
+params.put("active", 1); // filter active users
+
+Page<User> userPage = userService.getList(params);
+```
+
+Pagination
+```
+Page<User> firstPage = userService.getList(new PaginationRangeRequest(0, 49));
+Page<User> secondPage = userService.getList(new PaginationRangeRequest(50, 99));
 ```
