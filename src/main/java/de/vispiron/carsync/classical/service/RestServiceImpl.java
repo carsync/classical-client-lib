@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import de.vispiron.carsync.classical.converter.modelmapper.CustomInstantToStringConverter;
 import de.vispiron.carsync.classical.converter.modelmapper.CustomStringToInstantConverter;
+import de.vispiron.carsync.classical.converter.modelmapper.CustomStringToOffsetDateTimeConverter;
 import de.vispiron.carsync.classical.converter.objectmapper.CustomBooleanDeserializer;
 import de.vispiron.carsync.classical.domain.CarsyncDomain;
 import de.vispiron.carsync.classical.domain.CarsyncServerException;
@@ -68,6 +69,7 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 		modelMapper.getConfiguration().setFieldMatchingEnabled(true);
 		modelMapper.addConverter(new CustomInstantToStringConverter());
 		modelMapper.addConverter(new CustomStringToInstantConverter());
+		modelMapper.addConverter(new CustomStringToOffsetDateTimeConverter());
 	}
 
 	protected final URL endpointUrl;

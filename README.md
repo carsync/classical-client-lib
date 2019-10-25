@@ -42,13 +42,13 @@ vehicle.setLicensePlate("AB-C 5678");
 vehicleService.update(vehicle);
 
 ```
-you cannot delete a vehicle, but for other entities you can delete it woulds look like this:
+delete (for entities you can delete):
 ```
-vehicleService.delete(vehicle);
+divisionService.delete(division);
 ```
 or just by id
 ```
-vehicleService.update(1234);
+divisionService.delete(1234);
 ```
 
 
