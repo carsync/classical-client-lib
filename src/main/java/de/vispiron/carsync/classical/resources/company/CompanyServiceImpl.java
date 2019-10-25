@@ -7,7 +7,7 @@ public class CompanyServiceImpl extends RestServiceImpl<Company> implements Comp
 
 	public CompanyServiceImpl(CarsyncSession carsyncSession) {
 		super(carsyncSession,
-				"/api/division",
+				"/api/v4/division",
 				Company.class,
 				CompanyResponseDTO.class,
 				null,

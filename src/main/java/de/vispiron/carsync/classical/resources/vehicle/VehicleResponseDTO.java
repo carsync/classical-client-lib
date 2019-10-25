@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.vispiron.carsync.classical.dto.CarsyncDTO;
 import de.vispiron.carsync.classical.resources.company.CompanyResponseDTO;
 import de.vispiron.carsync.classical.resources.division.DivisionResponseDTO;
+import de.vispiron.carsync.classical.resources.user.UserResponseDTO;
 
 public class VehicleResponseDTO extends CarsyncDTO {
 
@@ -95,10 +96,11 @@ public class VehicleResponseDTO extends CarsyncDTO {
 	public Integer numDamages;
 
 	//public String obu;
-	//public String driver;
+	public UserResponseDTO driver;
 	//public String position;
 	//public String leasing;
 	public String lastUnlock;
-	//public String oneToOneDriver;
+
+	public UserResponseDTO oneToOneDriver;
 
 }

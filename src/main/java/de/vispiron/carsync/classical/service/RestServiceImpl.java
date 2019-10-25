@@ -1,5 +1,6 @@
 package de.vispiron.carsync.classical.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,9 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 	protected static HttpClient httpClient;
 
-	private static ObjectMapper objectMapper;
+	private static ObjectMapper putObjectMapper;
+
+	private static ObjectMapper postObjectMapper;
 
 	static {
 		httpClient = HttpClient.newBuilder()
@@ -49,11 +52,17 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 				.connectTimeout(Duration.ofSeconds(20))
 				.build();
 
-		objectMapper = new ObjectMapper();
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(Boolean.class, new CustomBooleanDeserializer());
-		objectMapper.registerModule(module);
+
+		putObjectMapper = new ObjectMapper();
+		putObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		putObjectMapper.registerModule(module);
+
+		postObjectMapper = new ObjectMapper();
+		postObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		postObjectMapper.registerModule(module);
+		postObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 		modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setFieldMatchingEnabled(true);
@@ -109,7 +118,7 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		String body;
 		try {
-			body = objectMapper.writeValueAsString(updateDto);
+			body = postObjectMapper.writeValueAsString(updateDto);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("IOException occurred: Cannot serialise payload");
 		}
@@ -120,10 +129,9 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		CarsyncDTO responseDto;
 		try {
-			responseDto = objectMapper.readValue(httpResponse.body(), this.responseDtoClass);
+			responseDto = putObjectMapper.readValue(httpResponse.body(), this.responseDtoClass);
 		} catch (IOException ex) {
-			throw new RuntimeException(
-					"IOException occurred: The response from the service is invalid");
+			throw new RuntimeException("IOException occurred: The response from the service is invalid");
 		}
 
 		modelMapper.map(responseDto, item);
@@ -160,10 +168,9 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		CarsyncDTO responseDto;
 		try {
-			responseDto = objectMapper.readValue(httpResponse.body(), this.responseDtoClass);
+			responseDto = putObjectMapper.readValue(httpResponse.body(), this.responseDtoClass);
 		} catch (IOException ex) {
-			throw new RuntimeException(
-					"IOException occurred: The response from the service is invalid");
+			throw new RuntimeException("IOException occurred: The response from the service is invalid");
 		}
 		T domain = modelMapper.map(responseDto, this.domainClass);
 		domain.setDatabaseState(responseDto);
@@ -195,13 +202,15 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		HttpRequest.Builder request = HttpRequest.newBuilder(uri).GET();
 
+		request.setHeader("Range", range.toString());
+
 		HttpResponse<String> httpResponse = getStringHttpResponse(request);
 
 		List<CarsyncDTO> responseDtoList;
 		CollectionType typeReference =
 				TypeFactory.defaultInstance().constructCollectionType(List.class, this.responseDtoClass);
 		try {
-			responseDtoList = objectMapper.readValue(httpResponse.body(), typeReference);
+			responseDtoList = putObjectMapper.readValue(httpResponse.body(), typeReference);
 		} catch (IOException ex) {
 			throw new RuntimeException(
 					"IOException occurred: The response from the service is invalid");
@@ -261,7 +270,7 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 				.collect(Collectors.joining("&"));
 
 		String newQuery = uri.getQuery();
-		if (newQuery == null) {
+		if (newQuery == null || newQuery.isBlank()) {
 			newQuery = appendQuery;
 		} else {
 			newQuery += "&" + appendQuery;
@@ -312,7 +321,7 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 			// error in some way. Try to put it in a CarsyncServerException.
 			CarsyncServerExceptionDTO serverExceptionDto;
 			try {
-				serverExceptionDto = objectMapper.readValue(httpResponse.body(), CarsyncServerExceptionDTO.class);
+				serverExceptionDto = putObjectMapper.readValue(httpResponse.body(), CarsyncServerExceptionDTO.class);
 			} catch (JsonProcessingException e) {
 				serverExceptionDto = new CarsyncServerExceptionDTO();
 				serverExceptionDto.error = "unable to parse error response";
@@ -376,11 +385,11 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		String body;
 		try {
-			ObjectNode obj1 = objectMapper.valueToTree(updateDto);
-			ObjectNode obj2 = objectMapper.valueToTree(updateDto2);
+			ObjectNode obj1 = putObjectMapper.valueToTree(updateDto);
+			ObjectNode obj2 = putObjectMapper.valueToTree(updateDto2);
 			ObjectNode changes = JsonDiff.diff(obj1, obj2);
 
-			body = objectMapper.writeValueAsString(changes);
+			body = putObjectMapper.writeValueAsString(changes);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(
 					"IOException occurred: Cannot serialise payload");
@@ -392,7 +401,7 @@ public abstract class RestServiceImpl<T extends CarsyncDomain> implements RestSe
 
 		CarsyncDTO responseDto;
 		try {
-			responseDto = objectMapper.readValue(httpResponse.body(), this.responseDtoClass);
+			responseDto = putObjectMapper.readValue(httpResponse.body(), this.responseDtoClass);
 		} catch (IOException ex) {
 			throw new RuntimeException(
 					"IOException occurred: The response from the service is invalid");

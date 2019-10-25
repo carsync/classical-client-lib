@@ -18,11 +18,11 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class VehicleServiceTest {
+class VehicleServiceTest {
 
-	final VehicleService vehicleService;
+	private final VehicleService vehicleService;
 
-	final WireMockServer wireMockServer;
+	private final WireMockServer wireMockServer;
 
 	VehicleServiceTest() {
 		CarsyncSession carsyncSession = new CarsyncSession("test@test.com", "password");
@@ -45,7 +45,7 @@ public class VehicleServiceTest {
 
 	@Test
 	void getList_InvalidSession_Exception() {
-		wireMockServer.stubFor(any(urlPathEqualTo("/api/vehicle")).willReturn(aResponse()
+		wireMockServer.stubFor(any(urlPathEqualTo("/api/v4/vehicle")).willReturn(aResponse()
 				.withStatus(401)
 				.withBody("[{\"error\":\"not logged in\"}]")));
 
@@ -54,7 +54,7 @@ public class VehicleServiceTest {
 
 	@Test
 	void getList_ValidSession_Ok() {
-		wireMockServer.stubFor(get(urlPathEqualTo("/api/vehicle")).willReturn(aResponse()
+		wireMockServer.stubFor(get(urlPathEqualTo("/api/v4/vehicle")).willReturn(aResponse()
 				.withBody("[{\"id\":\"1\"}]")
 				.withHeader("Content-Range", "items 0-0/1"))
 		);
@@ -66,7 +66,7 @@ public class VehicleServiceTest {
 
 	@Test
 	void get_ValidSession_Ok() {
-		wireMockServer.stubFor(get(urlPathEqualTo("/api/vehicle/1007")).willReturn(aResponse()
+		wireMockServer.stubFor(get(urlPathEqualTo("/api/v4/vehicle/1007")).willReturn(aResponse()
 				.withBody("{\"id\":\"1007\"}")));
 
 		Vehicle vehicle = vehicleService.get(1007);
@@ -75,7 +75,7 @@ public class VehicleServiceTest {
 
 	@Test
 	void update_ValidSession_Ok() {
-		wireMockServer.stubFor(put(urlPathEqualTo("/api/vehicle/1007")).willReturn(aResponse()
+		wireMockServer.stubFor(put(urlPathEqualTo("/api/v4/vehicle/1007")).willReturn(aResponse()
 				.withBody("{\"id\":\"1007\",\"licensePlate\":\"licensePlate3\"}")));
 
 		Vehicle vehicleIn = new Vehicle();
@@ -96,7 +96,7 @@ public class VehicleServiceTest {
 
 	@Test
 	void create_ValidSession_Ok() {
-		wireMockServer.stubFor(post(urlPathEqualTo("/api/vehicle")).willReturn(aResponse()
+		wireMockServer.stubFor(post(urlPathEqualTo("/api/v4/vehicle")).willReturn(aResponse()
 				.withBody("{\"id\":\"10\",\"licensePlate\":\"licensePlate2\"}")));
 
 		Vehicle vehicleIn = new Vehicle();

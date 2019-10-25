@@ -41,7 +41,7 @@ public class PaginationRangeRequest {
 			throw new RuntimeException("the range end must be superior or equal to the range start");
 		}
 		this.first = first;
-		this.first = last;
+		this.last = last;
 	}
 
 	public String toString() {

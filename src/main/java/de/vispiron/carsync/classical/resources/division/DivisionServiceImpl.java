@@ -7,7 +7,7 @@ public class DivisionServiceImpl extends RestServiceImpl<Division> implements Di
 
 	public DivisionServiceImpl(CarsyncSession carsyncSession) {
 		super(carsyncSession,
-				"/api/division",
+				"/api/v4/division",
 				Division.class,
 				DivisionResponseDTO.class,
 				DivisionCreateDTO.class,

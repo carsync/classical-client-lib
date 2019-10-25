@@ -3,6 +3,7 @@ package de.vispiron.carsync.classical.resources.vehicle;
 import de.vispiron.carsync.classical.domain.CarsyncIdDomain;
 import de.vispiron.carsync.classical.resources.company.Company;
 import de.vispiron.carsync.classical.resources.division.Division;
+import de.vispiron.carsync.classical.resources.user.User;
 import lombok.*;
 
 import java.time.Instant;
@@ -97,11 +98,12 @@ public class Vehicle extends CarsyncIdDomain {
 	private Integer numDamages;
 
 	//private String obu;
-	//private String driver;
+	private User driver;
 	//private String position;
 	//private String leasing;
 	private Instant lastUnlock;
-	//private String oneToOneDriver;
+
+	private User oneToOneDriver;
 
 	public void setCompanyId(Integer id) {
 		if (company == null || !company.getId().equals(id)) {

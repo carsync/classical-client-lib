@@ -7,7 +7,7 @@ public class VehicleServiceImpl extends RestServiceImpl<Vehicle> implements Vehi
 
 	public VehicleServiceImpl(CarsyncSession carsyncSession) {
 		super(carsyncSession,
-				"/api/vehicle",
+				"/api/v4/vehicle",
 				Vehicle.class,
 				VehicleResponseDTO.class,
 				VehicleCreateDTO.class,
